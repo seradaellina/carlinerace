@@ -44,18 +44,12 @@ npm install
 npx playwright install chromium
 ```
 
-### 3) Configure environment
-
-```bash
-cp backend/.env backend/.env
-```
-
 Optional:
 
 - `PORT` - backend API port (default `4000`)
 - `CAPTURE_CRON` - cron expression for periodic capture (default every 30 minutes)
 
-### 4) Start development mode
+### 3) Start development mode
 
 From root:
 
@@ -75,7 +69,7 @@ npm run build
 npm run start
 ```
 
-## Deployment 
+## Deployment
 
 The app was deployed to AWS and is currently available at:
 
