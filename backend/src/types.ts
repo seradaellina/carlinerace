@@ -3,7 +3,7 @@ export type TrackedApp = {
   name: string;
   packageId: string;
   playStoreUrl: string;
-  isActive: number;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 };

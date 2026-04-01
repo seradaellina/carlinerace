@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ScreenshotCard } from "../components/ScreenshotCard";
 import { useCaptureNowMutation } from "../api/hooks/useCaptureNowMutation";
@@ -11,15 +10,7 @@ export function TimelinePage() {
   const screenshotsQuery = useScreenshotsQuery(appId);
   const captureNowMutation = useCaptureNowMutation(appId);
 
-  const ordered = useMemo(
-    () =>
-      [...(screenshotsQuery.data?.screenshots ?? [])].sort((a, b) => {
-        return (
-          new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()
-        );
-      }),
-    [screenshotsQuery.data?.screenshots]
-  );
+  const ordered = screenshotsQuery.data?.screenshots ?? [];
 
   const handleBackClick = () => {
     navigate("/");

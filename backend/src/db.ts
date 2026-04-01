@@ -41,7 +41,7 @@ const toTrackedApp = (row: any): TrackedApp => ({
   name: row.name,
   packageId: row.package_id,
   playStoreUrl: row.play_store_url,
-  isActive: row.is_active,
+  isActive: Boolean(row.is_active),
   createdAt: row.created_at,
   updatedAt: row.updated_at
 });
@@ -68,6 +68,10 @@ export const appRepo = {
     const row = db.prepare("SELECT * FROM tracked_apps WHERE id = ?").get(id);
     return row ? toTrackedApp(row) : null;
   },
+  getByPackageId(packageId: string): TrackedApp | null {
+    const row = db.prepare("SELECT * FROM tracked_apps WHERE package_id = ?").get(packageId);
+    return row ? toTrackedApp(row) : null;
+  },
   create(input: { name: string; packageId: string; playStoreUrl: string }): TrackedApp {
     const now = new Date().toISOString();
     const stmt = db.prepare(
@@ -78,12 +82,12 @@ export const appRepo = {
   },
   update(
     id: number,
-    input: { name: string; packageId: string; playStoreUrl: string; isActive: number }
+    input: { name: string; packageId: string; playStoreUrl: string; isActive: boolean }
   ): TrackedApp | null {
     const now = new Date().toISOString();
     db.prepare(
       "UPDATE tracked_apps SET name = ?, package_id = ?, play_store_url = ?, is_active = ?, updated_at = ? WHERE id = ?"
-    ).run(input.name, input.packageId, input.playStoreUrl, input.isActive, now, id);
+    ).run(input.name, input.packageId, input.playStoreUrl, Number(input.isActive), now, id);
     return this.getById(id);
   }
 };

@@ -17,7 +17,10 @@ export const appsRouter = Router();
 
 const parseAppId = (idParam: string): number | null => {
   const id = Number(idParam);
-  return Number.isNaN(id) ? null : id;
+  if (!Number.isInteger(id) || id <= 0) {
+    return null;
+  }
+  return id;
 };
 
 appsRouter.get("/", (_req, res) => {
@@ -29,6 +32,11 @@ appsRouter.post("/", (req, res) => {
   const packageId = extractPackageId(playStoreUrl);
   if (!packageId) {
     return res.status(400).json({ error: "Invalid Google Play URL" });
+  }
+
+  const existing = appRepo.getByPackageId(packageId);
+  if (existing) {
+    return res.status(409).json({ error: "App already exists" });
   }
 
   const created = appRepo.create({
@@ -60,7 +68,7 @@ appsRouter.put("/:id", (req, res) => {
     name: (name || current.name).trim(),
     packageId,
     playStoreUrl: defaultPlayStoreUrl(packageId),
-    isActive: isActive === undefined ? current.isActive : Number(isActive)
+    isActive: isActive ?? current.isActive
   });
   return res.json(updated);
 });
@@ -93,6 +101,11 @@ appsRouter.post("/:id/capture", async (req, res) => {
     return res.status(404).json({ error: "App not found" });
   }
 
-  await captureAppListing(appItem);
-  return res.status(202).json({ ok: true });
+  try {
+    await captureAppListing(appItem);
+    return res.status(202).json({ ok: true });
+  } catch (error) {
+    console.error(`Manual capture failed for app ${appItem.id}`, error);
+    return res.status(502).json({ error: "Failed to capture screenshot" });
+  }
 });
